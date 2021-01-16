@@ -38,8 +38,8 @@ public class ServerImpl implements Server {
         if (validateChecksum(envelope)) {
             // Save to persistence.
             persist(envelope);
-            pushToDataLake(envelope);
             log.info("Data persisted successfully, data name: {}", envelope.getDataHeader().getName());
+            pushToDataLake(envelope);
             return true;
         }
         return false;
