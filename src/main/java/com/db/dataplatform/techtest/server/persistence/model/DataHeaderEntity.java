@@ -42,6 +42,9 @@ public class DataHeaderEntity {
     @Column(name = "CREATED_TIMESTAMP")
     private Instant createdTimestamp;
 
+    @Column(name = "CHECKSUM")
+    private String checksum;
+
     @PrePersist
     public void setTimestamps() {
         if (createdTimestamp == null) {
