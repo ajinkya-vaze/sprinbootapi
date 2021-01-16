@@ -35,8 +35,7 @@ public class TestDataHelper {
         DataBody dataBody = createDataBody();
         DataHeader dataHeader = createDataHeader(TEST_NAME, DUMMY_DATA_MD5_CHECKSUM);
 
-        DataEnvelope dataEnvelope = new DataEnvelope(dataHeader, dataBody);
-        return dataEnvelope;
+        return new DataEnvelope(dataHeader, dataBody);
     }
 
     private static DataHeader createDataHeader(String testName, String checksum) {
@@ -51,8 +50,14 @@ public class TestDataHelper {
         DataBody dataBody = createDataBody();
         DataHeader dataHeader = createDataHeader(TEST_NAME, "testChecksum");
 
-        DataEnvelope dataEnvelope = new DataEnvelope(dataHeader, dataBody);
-        return dataEnvelope;
+        return new DataEnvelope(dataHeader, dataBody);
+    }
+
+    public static DataEnvelope createTestDataEnvelopeApiObjectWithLowercaseChecksum() {
+        DataBody dataBody = createDataBody();
+        DataHeader dataHeader = createDataHeader(TEST_NAME, DUMMY_DATA_MD5_CHECKSUM.toLowerCase());
+
+        return new DataEnvelope(dataHeader, dataBody);
     }
 
     public static DataEnvelope createTestDataEnvelopeApiObjectWithEmptyName() {

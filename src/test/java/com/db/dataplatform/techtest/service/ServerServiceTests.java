@@ -17,8 +17,7 @@ import org.modelmapper.ModelMapper;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
-import static com.db.dataplatform.techtest.TestDataHelper.createTestDataEnvelopeApiObject;
-import static com.db.dataplatform.techtest.TestDataHelper.createTestDataEnvelopeApiObjectWithWrongChecksum;
+import static com.db.dataplatform.techtest.TestDataHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -60,6 +59,15 @@ public class ServerServiceTests {
         boolean success = server.saveDataEnvelope(testDataEnvelope);
 
         assertThat(success).isFalse();
+        //verify(dataBodyServiceImplMock, times(1)).saveDataBody(eq(expectedDataBodyEntity));
+    }
+
+    @Test
+    public void shouldSaveDataEnvelopeIfChecksumCaseDoesNotMatch() throws NoSuchAlgorithmException, IOException {
+        testDataEnvelope = createTestDataEnvelopeApiObjectWithLowercaseChecksum();
+        boolean success = server.saveDataEnvelope(testDataEnvelope);
+
+        assertThat(success).isTrue();
         //verify(dataBodyServiceImplMock, times(1)).saveDataBody(eq(expectedDataBodyEntity));
     }
 }

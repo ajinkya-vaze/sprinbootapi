@@ -1,10 +1,11 @@
 package com.db.dataplatform.techtest.server.component.impl;
 
 import com.db.dataplatform.techtest.server.api.model.DataEnvelope;
+import com.db.dataplatform.techtest.server.component.Server;
 import com.db.dataplatform.techtest.server.persistence.model.DataBodyEntity;
 import com.db.dataplatform.techtest.server.persistence.model.DataHeaderEntity;
 import com.db.dataplatform.techtest.server.service.DataBodyService;
-import com.db.dataplatform.techtest.server.component.Server;
+import com.db.dataplatform.techtest.server.util.MD5Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -24,7 +25,7 @@ public class ServerImpl implements Server {
      */
     @Override
     public boolean saveDataEnvelope(DataEnvelope envelope) {
-        if(validateChecksum(envelope)) {
+        if (validateChecksum(envelope)) {
             // Save to persistence.
             persist(envelope);
             log.info("Data persisted successfully, data name: {}", envelope.getDataHeader().getName());
@@ -34,7 +35,8 @@ public class ServerImpl implements Server {
     }
 
     private boolean validateChecksum(DataEnvelope envelope) {
-        return true;
+        String calculatedChecksum = MD5Util.getMd5Hash(envelope.getDataBody().getDataBody());
+        return calculatedChecksum.equalsIgnoreCase(envelope.getDataHeader().getChecksum());
     }
 
     private void persist(DataEnvelope envelope) {
