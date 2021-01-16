@@ -31,6 +31,12 @@ public class TestDataHelper {
         return dataBodyEntity;
     }
 
+    public static DataBodyEntity createTestDataBodyEntity() {
+        DataHeaderEntity dataHeaderEntity = createTestDataHeaderEntity(Instant.now());
+        DataBodyEntity dataBodyEntity = createTestDataBodyEntity(dataHeaderEntity);
+
+        return dataBodyEntity;
+    }
     public static DataEnvelope createTestDataEnvelopeApiObject() {
         DataBody dataBody = createDataBody();
         DataHeader dataHeader = createDataHeader(TEST_NAME, DUMMY_DATA_MD5_CHECKSUM);

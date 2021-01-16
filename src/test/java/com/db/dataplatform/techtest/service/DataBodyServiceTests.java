@@ -1,5 +1,6 @@
 package com.db.dataplatform.techtest.service;
 
+import com.db.dataplatform.techtest.server.persistence.BlockTypeEnum;
 import com.db.dataplatform.techtest.server.persistence.model.DataBodyEntity;
 import com.db.dataplatform.techtest.server.persistence.model.DataHeaderEntity;
 import com.db.dataplatform.techtest.server.persistence.repository.DataStoreRepository;
@@ -13,8 +14,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.Instant;
 
-import static com.db.dataplatform.techtest.TestDataHelper.createTestDataBodyEntity;
-import static com.db.dataplatform.techtest.TestDataHelper.createTestDataHeaderEntity;
+import static com.db.dataplatform.techtest.TestDataHelper.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,6 +44,18 @@ public class DataBodyServiceTests {
 
         verify(dataStoreRepositoryMock, times(1))
                 .save(eq(expectedDataBodyEntity));
+    }
+
+    @Test
+    public void getDataByBlockTypeShouldQueryTheRepository() {
+        dataBodyService.getDataByBlockType(BlockTypeEnum.BLOCKTYPEA);
+        verify(dataStoreRepositoryMock, times(1)).findByBlockType(BlockTypeEnum.BLOCKTYPEA);
+    }
+
+    @Test
+    public void getDataByBlockNameShouldQueryTheRepository() {
+        dataBodyService.getDataByBlockName(TEST_NAME);
+        verify(dataStoreRepositoryMock, times(1)).findByBlockName(TEST_NAME);
     }
 
 }

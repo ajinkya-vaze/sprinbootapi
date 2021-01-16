@@ -5,11 +5,15 @@ import com.db.dataplatform.techtest.server.api.model.DataEnvelope;
 import com.db.dataplatform.techtest.server.api.model.DataHeader;
 import com.db.dataplatform.techtest.server.component.Server;
 import com.db.dataplatform.techtest.server.component.impl.ServerImpl;
+import com.db.dataplatform.techtest.server.exception.RecordNotFoundException;
 import com.db.dataplatform.techtest.server.mapper.ServerMapperConfiguration;
+import com.db.dataplatform.techtest.server.persistence.BlockTypeEnum;
 import com.db.dataplatform.techtest.server.persistence.model.DataBodyEntity;
 import com.db.dataplatform.techtest.server.persistence.model.DataHeaderEntity;
 import com.db.dataplatform.techtest.server.service.DataBodyService;
 import com.db.dataplatform.techtest.server.service.DataLakeService;
+import org.assertj.core.internal.cglib.core.Block;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +24,9 @@ import org.modelmapper.ModelMapper;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 import static com.db.dataplatform.techtest.TestDataHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,7 +69,7 @@ public class ServerServiceTests {
     }
 
     @Test
-    public void shouldSaveDataEnvelopeAsExpected() throws NoSuchAlgorithmException, IOException {
+    public void shouldSaveDataEnvelopeAsExpected() {
         boolean success = server.saveDataEnvelope(testDataEnvelope);
 
         assertThat(success).isTrue();
@@ -70,7 +77,7 @@ public class ServerServiceTests {
     }
 
     @Test
-    public void shouldNotSaveDataEnvelopeIfChecksumFails() throws NoSuchAlgorithmException, IOException {
+    public void shouldNotSaveDataEnvelopeIfChecksumFails() {
         testDataEnvelope = createTestDataEnvelopeApiObjectWithWrongChecksum();
         boolean success = server.saveDataEnvelope(testDataEnvelope);
 
@@ -79,11 +86,40 @@ public class ServerServiceTests {
     }
 
     @Test
-    public void shouldSaveDataEnvelopeIfChecksumCaseDoesNotMatch() throws NoSuchAlgorithmException, IOException {
+    public void shouldSaveDataEnvelopeIfChecksumCaseDoesNotMatch() {
         testDataEnvelope = createTestDataEnvelopeApiObjectWithLowercaseChecksum();
         boolean success = server.saveDataEnvelope(testDataEnvelope);
 
         assertThat(success).isTrue();
         verify(dataBodyServiceImplMock, times(1)).saveDataBody(eq(expectedDataBodyEntity));
+    }
+
+    @Test
+    public void getDataByBlockTypeShouldMapDataToDataEnvelope() {
+        DataBodyEntity dataBodyEntity = createTestDataBodyEntity();
+        when(dataBodyServiceImplMock.getDataByBlockType(BlockTypeEnum.BLOCKTYPEA)).thenReturn(Arrays.asList(dataBodyEntity));
+
+        when(modelMapper.map(any(DataBodyEntity.class),  ArgumentMatchers.<Class<DataBody>>any())).thenReturn(testDataEnvelope.getDataBody());
+        when(modelMapper.map(any(DataHeaderEntity.class), ArgumentMatchers.<Class<DataHeader>>any())).thenReturn(testDataEnvelope.getDataHeader());
+        List<DataEnvelope> dataEnvelopes = server.getDataByBlockType(BlockTypeEnum.BLOCKTYPEA);
+        DataEnvelope dataEnvelope = dataEnvelopes.get(0);
+
+        Assert.assertEquals(dataBodyEntity.getDataBody(), dataEnvelope.getDataBody().getDataBody());
+        Assert.assertEquals(dataBodyEntity.getDataHeaderEntity().getName(), dataEnvelope.getDataHeader().getName());
+    }
+
+    @Test(expected = RecordNotFoundException.class)
+    public void updateBlockTypeByNameThrowsExceptionWhenDataNotFound() throws RecordNotFoundException {
+        when(dataBodyServiceImplMock.getDataByBlockName(TEST_NAME)).thenReturn(Optional.empty());
+        server.updateBlockTypeByName(TEST_NAME, BlockTypeEnum.BLOCKTYPEB);
+    }
+
+    @Test
+    public void updateBlockTypeByNameUpdatesDataInTheRepository() throws RecordNotFoundException {
+        DataBodyEntity dataBodyEntity = createTestDataBodyEntity();
+        when(dataBodyServiceImplMock.getDataByBlockName(TEST_NAME)).thenReturn(Optional.of(dataBodyEntity));
+        server.updateBlockTypeByName(TEST_NAME, BlockTypeEnum.BLOCKTYPEB);
+        verify(dataBodyServiceImplMock, times(1))
+                .saveDataBody(eq(dataBodyEntity));
     }
 }

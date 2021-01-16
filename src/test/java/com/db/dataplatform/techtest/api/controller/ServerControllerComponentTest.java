@@ -4,6 +4,7 @@ import com.db.dataplatform.techtest.TestDataHelper;
 import com.db.dataplatform.techtest.server.api.controller.ServerController;
 import com.db.dataplatform.techtest.server.api.model.DataEnvelope;
 import com.db.dataplatform.techtest.server.component.Server;
+import com.db.dataplatform.techtest.server.exception.RecordNotFoundException;
 import com.db.dataplatform.techtest.server.persistence.BlockTypeEnum;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Before;
@@ -87,5 +88,12 @@ public class ServerControllerComponentTest {
 
         boolean updateSuccessful = Boolean.parseBoolean(mvcResult.getResponse().getContentAsString());
         assertThat(updateSuccessful).isTrue();
+    }
+
+    @Test
+    public void testUpdateBlockTypeByBlockNameValidatesBlockName() throws Exception {
+        when(serverMock.updateBlockTypeByName(testDataEnvelope.getDataHeader().getName(), BlockTypeEnum.BLOCKTYPEA)).thenThrow(new RecordNotFoundException("Data not found."));
+        mockMvc.perform(patch(URI_PATCHDATA.expand(testDataEnvelope.getDataHeader().getName(), BlockTypeEnum.BLOCKTYPEA.name())))
+                .andExpect(status().is4xxClientError());
     }
 }
