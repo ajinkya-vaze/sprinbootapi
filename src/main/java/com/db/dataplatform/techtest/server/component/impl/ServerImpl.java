@@ -30,7 +30,8 @@ public class ServerImpl implements Server {
     private final DataLakeService dataLakeService;
 
     /**
-     * @param envelope
+     * Saves envelop in the database if checksum matches.
+     * @param envelope Data to be saved in the database
      * @return true if there is a match with the client provided checksum.
      */
     @Override
@@ -49,12 +50,24 @@ public class ServerImpl implements Server {
         dataLakeService.saveDataEnvelope(envelope);
     }
 
+    /**
+     * Finds data by block type
+     * @param blockType Block type to be search in the database
+     * @return List of DataEnvelop models containing data
+     */
     @Override
     public List<DataEnvelope> getDataByBlockType(BlockTypeEnum blockType) {
         List<DataBodyEntity> dataBodyEntities = dataBodyServiceImpl.getDataByBlockType(blockType);
         return mapToDataEnvelop(dataBodyEntities);
     }
 
+    /**
+     * Updates block type by for given block name
+     * @param blockName Name of the block to be updated
+     * @param blockType Block type to be updated
+     * @return true if data is successfully updated in the database
+     * @throws RecordNotFoundException if there is no record in the database with given blockName
+     */
     @Override
     public boolean updateBlockTypeByName(String blockName, BlockTypeEnum blockType) throws RecordNotFoundException {
         Optional<DataBodyEntity> dataBodyEntityOptional = dataBodyServiceImpl.getDataByBlockName(blockName);
@@ -64,6 +77,7 @@ public class ServerImpl implements Server {
         DataBodyEntity dataBodyEntity = dataBodyEntityOptional.get();
         dataBodyEntity.getDataHeaderEntity().setBlocktype(blockType);
         saveData(dataBodyEntity);
+        log.info("Data updated successfully, data name: {} and block type: {}", blockName, blockType);
         return true;
     }
 

@@ -31,12 +31,12 @@ public class ClientImpl implements Client {
     @Override
     public boolean pushData(DataEnvelope dataEnvelope) {
         log.info("Pushing data {} to {}", dataEnvelope.getDataHeader().getName(), URI_PUSHDATA);
-        HttpEntity<DataEnvelope> request = new HttpEntity<>(dataEnvelope);
         try {
+            HttpEntity<DataEnvelope> request = new HttpEntity<>(dataEnvelope);
             boolean response = restTemplate.postForObject(URI_PUSHDATA, request, Boolean.class);
             log.info("Successfully pushed data {} to server. Checksum check {}.", dataEnvelope.getDataHeader().getName(), getChecksumStatus(response));
             return response;
-        } catch (RestClientException rce) {
+        } catch (Exception rce) {
             log.error("Exception while pushing data {} to server", dataEnvelope.getDataHeader().getName(), rce);
             return false;
         }
@@ -53,7 +53,7 @@ public class ClientImpl implements Client {
             List<DataEnvelope> responseData = restTemplate.getForObject(URI_GETDATA.expand(blockType), List.class);
             log.info("Successfully received response from server for block type {}", blockType);
             return responseData;
-        } catch (RestClientException rce) {
+        } catch (Exception rce) {
             log.error("Exception while querying for data with header block type {}", blockType, rce);
             return Collections.emptyList();
         }
@@ -67,7 +67,7 @@ public class ClientImpl implements Client {
             boolean response = restTemplate.patchForObject(URI_PATCHDATA.expand(blockName, newBlockType), request, Boolean.class);
             log.info("Successfully updated blocktype to {} for block with name {}", newBlockType, blockName);
             return response;
-        } catch (RestClientException rce) {
+        } catch (Exception rce) {
             log.error("Exception while updating blocktype to {} for block with name {}", newBlockType, blockName);
             return false;
         }

@@ -78,7 +78,7 @@ public class ClientImplTest {
     @Test
     public void getDataShouldWorkWhenApiCallIsSuccessful() {
         List<DataEnvelope> expectedData = Arrays.asList(testDataEnvelope);
-        when(restTemplate.getForObject(any(URI.class), ArgumentMatchers.<Class<List>>any())).thenReturn(expectedData);
+        when(restTemplate.getForObject(any(URI.class), ArgumentMatchers.<Class<List<DataEnvelope>>>any())).thenReturn(expectedData);
         List<DataEnvelope> actualData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
         assertEquals(expectedData, actualData);
     }
@@ -86,7 +86,7 @@ public class ClientImplTest {
     @Test
     public void getDataReturnEmptyListWhenApiCallFailsWithInvalidInput() {
         when(restTemplate
-                .getForObject(any(URI.class), ArgumentMatchers.<Class<List>>any())
+                .getForObject(any(URI.class), ArgumentMatchers.<Class<List<DataEnvelope>>>any())
         ).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
         List<DataEnvelope> responseData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
         assertEquals(0, responseData.size());
@@ -95,7 +95,7 @@ public class ClientImplTest {
     @Test
     public void getDataReturnEmptyListWhenApiCallFailsWithInvalidResponseFromServer() {
         when(restTemplate
-                .getForObject(any(URI.class), ArgumentMatchers.<Class<List>>any())
+                .getForObject(any(URI.class), ArgumentMatchers.<Class<List<DataEnvelope>>>any())
         ).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         List<DataEnvelope> responseData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
         assertEquals(0, responseData.size());
@@ -104,7 +104,7 @@ public class ClientImplTest {
     @Test
     public void getDataReturnEmptyListWhenApiCallFails() {
         when(restTemplate
-                .getForObject(any(URI.class), ArgumentMatchers.<Class<List>>any())
+                .getForObject(any(URI.class), ArgumentMatchers.<Class<List<DataEnvelope>>>any())
         ).thenThrow(new RestClientException("Exception while creating the request"));
         List<DataEnvelope> responseData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
         assertEquals(0, responseData.size());

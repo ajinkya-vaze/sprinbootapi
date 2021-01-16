@@ -12,7 +12,6 @@ import com.db.dataplatform.techtest.server.persistence.model.DataBodyEntity;
 import com.db.dataplatform.techtest.server.persistence.model.DataHeaderEntity;
 import com.db.dataplatform.techtest.server.service.DataBodyService;
 import com.db.dataplatform.techtest.server.service.DataLakeService;
-import org.assertj.core.internal.cglib.core.Block;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,8 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.modelmapper.ModelMapper;
 
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -99,7 +96,7 @@ public class ServerServiceTests {
         DataBodyEntity dataBodyEntity = createTestDataBodyEntity();
         when(dataBodyServiceImplMock.getDataByBlockType(BlockTypeEnum.BLOCKTYPEA)).thenReturn(Arrays.asList(dataBodyEntity));
 
-        when(modelMapper.map(any(DataBodyEntity.class),  ArgumentMatchers.<Class<DataBody>>any())).thenReturn(testDataEnvelope.getDataBody());
+        when(modelMapper.map(any(DataBodyEntity.class), ArgumentMatchers.<Class<DataBody>>any())).thenReturn(testDataEnvelope.getDataBody());
         when(modelMapper.map(any(DataHeaderEntity.class), ArgumentMatchers.<Class<DataHeader>>any())).thenReturn(testDataEnvelope.getDataHeader());
         List<DataEnvelope> dataEnvelopes = server.getDataByBlockType(BlockTypeEnum.BLOCKTYPEA);
         DataEnvelope dataEnvelope = dataEnvelopes.get(0);
