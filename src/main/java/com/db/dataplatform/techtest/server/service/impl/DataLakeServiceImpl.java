@@ -22,8 +22,8 @@ public class DataLakeServiceImpl implements DataLakeService {
     @Async
     public void saveDataEnvelope(DataEnvelope dataEnvelope) {
         log.info("Pushing data {} to {} ", dataEnvelope.getDataHeader().getName(), DATA_LAKE_PUSH_DATA_URL);
-        HttpEntity<DataEnvelope> request = new HttpEntity<>(dataEnvelope);
         try {
+            HttpEntity<DataEnvelope> request = new HttpEntity<>(dataEnvelope);
             ResponseEntity<HttpStatus> response = restTemplate.postForEntity(DATA_LAKE_PUSH_DATA_URL, request, HttpStatus.class);
             if (response.getStatusCode().is2xxSuccessful()) {
                 log.info("Successfully pushed data {} to data lake.", dataEnvelope.getDataHeader().getName());
