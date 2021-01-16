@@ -32,12 +32,12 @@ public class HadoopDummyServerController {
 
         log.info("Saving to Hadoop file system");
         Random random = new Random();
-        int workDuration = random.ints(20000, 40000).findAny().getAsInt();
+        int workDuration = random.ints(2000, 4000).findAny().getAsInt();
 
         // Simulate long running work.
         Thread.sleep(workDuration);
 
-        if (workDuration > 3000) {
+        if(workDuration > 3000) {
             log.info("Hadoop back end has timed out");
             return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).build();
         }
