@@ -48,6 +48,13 @@ public class ClientImplTest {
     }
 
     @Test
+    public void pushDataShouldReturnChecksumStatus() {
+        when(restTemplate.postForObject(any(String.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any())).thenReturn(false);
+        boolean response = client.pushData(testDataEnvelope);
+        assertFalse(response);
+    }
+
+    @Test
     public void pushDataReturnsFalseWhenHttpCallResultsInClientException() {
         when(restTemplate.postForObject(any(String.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any())).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
         boolean response = client.pushData(testDataEnvelope);
