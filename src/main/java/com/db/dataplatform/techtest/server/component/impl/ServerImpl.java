@@ -4,6 +4,7 @@ import com.db.dataplatform.techtest.server.api.model.DataBody;
 import com.db.dataplatform.techtest.server.api.model.DataEnvelope;
 import com.db.dataplatform.techtest.server.api.model.DataHeader;
 import com.db.dataplatform.techtest.server.component.Server;
+import com.db.dataplatform.techtest.server.exception.RecordNotFoundException;
 import com.db.dataplatform.techtest.server.persistence.BlockTypeEnum;
 import com.db.dataplatform.techtest.server.persistence.model.DataBodyEntity;
 import com.db.dataplatform.techtest.server.persistence.model.DataHeaderEntity;
@@ -15,6 +16,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -34,16 +36,33 @@ public class ServerImpl implements Server {
         if (validateChecksum(envelope)) {
             // Save to persistence.
             persist(envelope);
+            pushToDataLake(envelope);
             log.info("Data persisted successfully, data name: {}", envelope.getDataHeader().getName());
             return true;
         }
         return false;
     }
 
+    private void pushToDataLake(DataEnvelope envelope) {
+
+    }
+
     @Override
     public List<DataEnvelope> getDataByBlockType(BlockTypeEnum blockType) {
         List<DataBodyEntity> dataBodyEntities = dataBodyServiceImpl.getDataByBlockType(blockType);
         return mapToDataEnvelop(dataBodyEntities);
+    }
+
+    @Override
+    public boolean updateBlockTypeByName(String blockName, BlockTypeEnum blockType) throws RecordNotFoundException {
+        Optional<DataBodyEntity> dataBodyEntityOptional = dataBodyServiceImpl.getDataByBlockName(blockName);
+        if (!dataBodyEntityOptional.isPresent()) {
+            throw new RecordNotFoundException(String.format("Block with block name %s is not present on server.", blockName));
+        }
+        DataBodyEntity dataBodyEntity = dataBodyEntityOptional.get();
+        dataBodyEntity.getDataHeaderEntity().setBlocktype(blockType);
+        saveData(dataBodyEntity);
+        return true;
     }
 
     private List<DataEnvelope> mapToDataEnvelop(List<DataBodyEntity> dataBodyEntities) {

@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.db.dataplatform.techtest.TestDataHelper.TEST_NAME;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -99,5 +100,37 @@ public class ClientImplTest {
         ).thenThrow(new RestClientException("Exception while creating the request"));
         List<DataEnvelope> responseData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
         assertEquals(0, responseData.size());
+    }
+
+    @Test
+    public void updateDataShouldWorkWhenApiCallIsSuccessful() {
+        when(restTemplate.patchForObject(any(String.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any(), any(String.class), any(String.class))).thenReturn(true);
+        boolean response = client.updateData(TEST_NAME, BlockTypeEnum.BLOCKTYPEB.name());
+        assertTrue(response);
+    }
+
+    @Test
+    public void updateDataReturnsFalseWhenHttpCallResultsInClientException() {
+        when(restTemplate.patchForObject(any(String.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any(), any(String.class), any(String.class)))
+                .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+        boolean response = client.updateData(TEST_NAME, BlockTypeEnum.BLOCKTYPEB.name());
+        assertFalse(response);
+    }
+
+    @Test
+    public void updateDataReturnsFalseWhenHttpCallResultsInServerException() {
+        when(restTemplate.patchForObject(any(String.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any(), any(String.class), any(String.class)))
+                .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+        boolean response = client.updateData(TEST_NAME, BlockTypeEnum.BLOCKTYPEB.name());
+        assertFalse(response);
+    }
+
+    @Test
+    public void updateDataReturnsFalseRestClientFails() {
+        when(restTemplate.patchForObject(any(String.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any(), any(String.class), any(String.class)))
+                .thenThrow(new RestClientException("Exception while updating the data"));
+        boolean response = client.updateData(TEST_NAME, BlockTypeEnum.BLOCKTYPEB.name());
+        assertFalse(response);
+
     }
 }
