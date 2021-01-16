@@ -50,7 +50,7 @@ public class ClientImpl implements Client {
     public List<DataEnvelope> getData(String blockType) {
         log.info("Query for data with header block type {}", blockType);
         try {
-            List<DataEnvelope> responseData = restTemplate.getForObject(URI_GETDATA.toString(), List.class, blockType);
+            List<DataEnvelope> responseData = restTemplate.getForObject(URI_GETDATA.expand(blockType), List.class);
             log.info("Successfully received response from server for block type {}", blockType);
             return responseData;
         } catch (RestClientException rce) {
@@ -64,7 +64,7 @@ public class ClientImpl implements Client {
         log.info("Updating blocktype to {} for block with name {}", newBlockType, blockName);
         try {
             HttpEntity<DataEnvelope> request = new HttpEntity<>(null);
-            boolean response = restTemplate.patchForObject(URI_PATCHDATA.toString(), request, Boolean.class, blockName, newBlockType);
+            boolean response = restTemplate.patchForObject(URI_PATCHDATA.expand(blockName, newBlockType), request, Boolean.class);
             log.info("Successfully updated blocktype to {} for block with name {}", newBlockType, blockName);
             return response;
         } catch (RestClientException rce) {

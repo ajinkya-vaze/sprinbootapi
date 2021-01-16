@@ -15,6 +15,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class ClientImplTest {
     @Test
     public void getDataShouldWorkWhenApiCallIsSuccessful() {
         List<DataEnvelope> expectedData = Arrays.asList(testDataEnvelope);
-        when(restTemplate.getForObject(any(String.class), ArgumentMatchers.<Class<List>>any(), any(Object.class))).thenReturn(expectedData);
+        when(restTemplate.getForObject(any(URI.class), ArgumentMatchers.<Class<List>>any())).thenReturn(expectedData);
         List<DataEnvelope> actualData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
         assertEquals(expectedData, actualData);
     }
@@ -78,7 +79,7 @@ public class ClientImplTest {
     @Test
     public void getDataReturnEmptyListWhenApiCallFailsWithInvalidInput() {
         when(restTemplate
-                .getForObject(any(String.class), ArgumentMatchers.<Class<List>>any(), any(Object.class))
+                .getForObject(any(URI.class), ArgumentMatchers.<Class<List>>any())
         ).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
         List<DataEnvelope> responseData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
         assertEquals(0, responseData.size());
@@ -87,7 +88,7 @@ public class ClientImplTest {
     @Test
     public void getDataReturnEmptyListWhenApiCallFailsWithInvalidResponseFromServer() {
         when(restTemplate
-                .getForObject(any(String.class), ArgumentMatchers.<Class<List>>any(), any(Object.class))
+                .getForObject(any(URI.class), ArgumentMatchers.<Class<List>>any())
         ).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         List<DataEnvelope> responseData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
         assertEquals(0, responseData.size());
@@ -96,7 +97,7 @@ public class ClientImplTest {
     @Test
     public void getDataReturnEmptyListWhenApiCallFails() {
         when(restTemplate
-                .getForObject(any(String.class), ArgumentMatchers.<Class<List>>any(), any(Object.class))
+                .getForObject(any(URI.class), ArgumentMatchers.<Class<List>>any())
         ).thenThrow(new RestClientException("Exception while creating the request"));
         List<DataEnvelope> responseData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
         assertEquals(0, responseData.size());
@@ -104,14 +105,14 @@ public class ClientImplTest {
 
     @Test
     public void updateDataShouldWorkWhenApiCallIsSuccessful() {
-        when(restTemplate.patchForObject(any(String.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any(), any(String.class), any(String.class))).thenReturn(true);
+        when(restTemplate.patchForObject(any(URI.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any())).thenReturn(true);
         boolean response = client.updateData(TEST_NAME, BlockTypeEnum.BLOCKTYPEB.name());
         assertTrue(response);
     }
 
     @Test
     public void updateDataReturnsFalseWhenHttpCallResultsInClientException() {
-        when(restTemplate.patchForObject(any(String.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any(), any(String.class), any(String.class)))
+        when(restTemplate.patchForObject(any(URI.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any()))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
         boolean response = client.updateData(TEST_NAME, BlockTypeEnum.BLOCKTYPEB.name());
         assertFalse(response);
@@ -119,7 +120,7 @@ public class ClientImplTest {
 
     @Test
     public void updateDataReturnsFalseWhenHttpCallResultsInServerException() {
-        when(restTemplate.patchForObject(any(String.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any(), any(String.class), any(String.class)))
+        when(restTemplate.patchForObject(any(URI.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any()))
                 .thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
         boolean response = client.updateData(TEST_NAME, BlockTypeEnum.BLOCKTYPEB.name());
         assertFalse(response);
@@ -127,7 +128,7 @@ public class ClientImplTest {
 
     @Test
     public void updateDataReturnsFalseRestClientFails() {
-        when(restTemplate.patchForObject(any(String.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any(), any(String.class), any(String.class)))
+        when(restTemplate.patchForObject(any(URI.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any()))
                 .thenThrow(new RestClientException("Exception while updating the data"));
         boolean response = client.updateData(TEST_NAME, BlockTypeEnum.BLOCKTYPEB.name());
         assertFalse(response);

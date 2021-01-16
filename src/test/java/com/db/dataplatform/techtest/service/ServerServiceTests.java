@@ -3,12 +3,13 @@ package com.db.dataplatform.techtest.service;
 import com.db.dataplatform.techtest.server.api.model.DataBody;
 import com.db.dataplatform.techtest.server.api.model.DataEnvelope;
 import com.db.dataplatform.techtest.server.api.model.DataHeader;
+import com.db.dataplatform.techtest.server.component.Server;
+import com.db.dataplatform.techtest.server.component.impl.ServerImpl;
 import com.db.dataplatform.techtest.server.mapper.ServerMapperConfiguration;
 import com.db.dataplatform.techtest.server.persistence.model.DataBodyEntity;
 import com.db.dataplatform.techtest.server.persistence.model.DataHeaderEntity;
 import com.db.dataplatform.techtest.server.service.DataBodyService;
-import com.db.dataplatform.techtest.server.component.Server;
-import com.db.dataplatform.techtest.server.component.impl.ServerImpl;
+import com.db.dataplatform.techtest.server.service.DataLakeService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +35,9 @@ public class ServerServiceTests {
     @Mock
     private ModelMapper modelMapper;
 
+    @Mock
+    private DataLakeService dataLakeService;
+
     private DataBodyEntity expectedDataBodyEntity;
     private DataEnvelope testDataEnvelope;
 
@@ -53,7 +57,8 @@ public class ServerServiceTests {
         when(modelMapper.map(any(DataBody.class), ArgumentMatchers.<Class<DataBodyEntity>>any())).thenReturn(expectedDataBodyEntity);
         when(modelMapper.map(any(DataHeader.class), ArgumentMatchers.<Class<DataHeaderEntity>>any())).thenReturn(expectedDataHeaderEntity);
 
-        server = new ServerImpl(dataBodyServiceImplMock, modelMapper);
+        doNothing().when(dataLakeService).saveDataEnvelope(any(DataEnvelope.class));
+        server = new ServerImpl(dataBodyServiceImplMock, modelMapper, dataLakeService);
     }
 
     @Test

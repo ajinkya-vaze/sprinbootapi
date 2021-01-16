@@ -9,6 +9,7 @@ import com.db.dataplatform.techtest.server.persistence.BlockTypeEnum;
 import com.db.dataplatform.techtest.server.persistence.model.DataBodyEntity;
 import com.db.dataplatform.techtest.server.persistence.model.DataHeaderEntity;
 import com.db.dataplatform.techtest.server.service.DataBodyService;
+import com.db.dataplatform.techtest.server.service.DataLakeService;
 import com.db.dataplatform.techtest.server.util.MD5Util;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,7 @@ public class ServerImpl implements Server {
 
     private final DataBodyService dataBodyServiceImpl;
     private final ModelMapper modelMapper;
+    private final DataLakeService dataLakeService;
 
     /**
      * @param envelope
@@ -44,7 +46,7 @@ public class ServerImpl implements Server {
     }
 
     private void pushToDataLake(DataEnvelope envelope) {
-
+        dataLakeService.saveDataEnvelope(envelope);
     }
 
     @Override

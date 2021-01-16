@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.retry.annotation.EnableRetry;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -21,46 +22,47 @@ import static com.db.dataplatform.techtest.Constant.DUMMY_DATA_MD5_CHECKSUM;
 
 @SpringBootApplication
 @EnableRetry
+@EnableAsync
 public class TechTestApplication {
 
-	public static final String HEADER_NAME = "TSLA-USDGBP-10Y";
-	public static final String MD5_CHECKSUM = "cecfd3953783df706878aaec2c22aa70";
+    public static final String HEADER_NAME = "TSLA-USDGBP-10Y";
+    public static final String MD5_CHECKSUM = "cecfd3953783df706878aaec2c22aa70";
 
-	@Autowired
-	private Client client;
+    @Autowired
+    private Client client;
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		SpringApplication.run(TechTestApplication.class, args);
-	}
+        SpringApplication.run(TechTestApplication.class, args);
+    }
 
-	@EventListener(ApplicationReadyEvent.class)
-	public void initiatePushDataFlow() throws JsonProcessingException, UnsupportedEncodingException {
-		pushData();
+    @EventListener(ApplicationReadyEvent.class)
+    public void initiatePushDataFlow() throws JsonProcessingException, UnsupportedEncodingException {
+        pushData();
 
-		queryData();
+        queryData();
 
-		updateData();
-	}
+        updateData();
+    }
 
-	private void updateData() throws UnsupportedEncodingException {
-		boolean success = client.updateData(HEADER_NAME, BlockTypeEnum.BLOCKTYPEB.name());
-	}
+    private void updateData() throws UnsupportedEncodingException {
+        boolean success = client.updateData(HEADER_NAME, BlockTypeEnum.BLOCKTYPEB.name());
+    }
 
-	private void queryData() {
+    private void queryData() {
 
-		List<DataEnvelope> data = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
-	}
+        List<DataEnvelope> data = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
+    }
 
-	private void pushData() throws JsonProcessingException {
+    private void pushData() throws JsonProcessingException {
 
-		DataBody dataBody = new DataBody(DUMMY_DATA);
+        DataBody dataBody = new DataBody(DUMMY_DATA);
 
-		DataHeader dataHeader = new DataHeader(HEADER_NAME, BlockTypeEnum.BLOCKTYPEA, DUMMY_DATA_MD5_CHECKSUM);
+        DataHeader dataHeader = new DataHeader(HEADER_NAME, BlockTypeEnum.BLOCKTYPEA, DUMMY_DATA_MD5_CHECKSUM);
 
-		DataEnvelope dataEnvelope = new DataEnvelope(dataHeader, dataBody);
+        DataEnvelope dataEnvelope = new DataEnvelope(dataHeader, dataBody);
 
-		client.pushData(dataEnvelope);
-	}
+        client.pushData(dataEnvelope);
+    }
 
 }

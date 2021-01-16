@@ -4,22 +4,14 @@ import com.db.dataplatform.techtest.server.persistence.BlockTypeEnum;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 import java.time.Instant;
+import java.util.Objects;
 
 @Entity
 @Table(
         name = "DATA_HEADER",
-        uniqueConstraints = @UniqueConstraint(columnNames="NAME")
+        uniqueConstraints = @UniqueConstraint(columnNames = "NAME")
 )
 @Setter
 @Getter
@@ -50,5 +42,19 @@ public class DataHeaderEntity {
         if (createdTimestamp == null) {
             createdTimestamp = Instant.now();
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        DataHeaderEntity that = (DataHeaderEntity) o;
+        return name.equals(that.name) &&
+                blocktype == that.blocktype;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, blocktype);
     }
 }
