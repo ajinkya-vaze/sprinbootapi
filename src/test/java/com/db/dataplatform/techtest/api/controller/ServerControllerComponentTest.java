@@ -44,7 +44,7 @@ public class ServerControllerComponentTest {
 	private ServerController serverController;
 
 	@Before
-	public void setUp() throws HadoopClientException, NoSuchAlgorithmException, IOException {
+	public void setUp() {
 		serverController = new ServerController(serverMock);
 		mockMvc = standaloneSetup(serverController).build();
 		objectMapper = Jackson2ObjectMapperBuilder
