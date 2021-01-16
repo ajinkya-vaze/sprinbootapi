@@ -50,6 +50,7 @@ public class ServerController {
             boolean updateSuccessful = server.updateBlockTypeByName(name, newBlockType);
             return ResponseEntity.ok(updateSuccessful);
         } catch (RecordNotFoundException e) {
+            log.error("Block with name {} not found, update request failed.", name, e);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage(), e);
         }
     }
