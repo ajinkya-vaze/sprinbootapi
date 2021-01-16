@@ -19,5 +19,6 @@ public class DataHeaderTests {
 
         assertThat(dataHeader.getName()).isEqualTo(TEST_NAME);
         assertThat(dataHeader.getBlockType()).isEqualTo(BlockTypeEnum.BLOCKTYPEA);
+        assertThat(dataHeader.getChecksum()).isEqualTo(DUMMY_DATA_MD5_CHECKSUM);
     }
 }
