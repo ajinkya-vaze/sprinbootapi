@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 
 import static com.db.dataplatform.techtest.TestDataHelper.createTestDataEnvelopeApiObject;
+import static com.db.dataplatform.techtest.TestDataHelper.createTestDataEnvelopeApiObjectWithWrongChecksum;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,6 +51,15 @@ public class ServerServiceTests {
         boolean success = server.saveDataEnvelope(testDataEnvelope);
 
         assertThat(success).isTrue();
+        //verify(dataBodyServiceImplMock, times(1)).saveDataBody(eq(expectedDataBodyEntity));
+    }
+
+    @Test
+    public void shouldNotSaveDataEnvelopeIfChecksumFails() throws NoSuchAlgorithmException, IOException {
+        testDataEnvelope = createTestDataEnvelopeApiObjectWithWrongChecksum();
+        boolean success = server.saveDataEnvelope(testDataEnvelope);
+
+        assertThat(success).isFalse();
         //verify(dataBodyServiceImplMock, times(1)).saveDataBody(eq(expectedDataBodyEntity));
     }
 }

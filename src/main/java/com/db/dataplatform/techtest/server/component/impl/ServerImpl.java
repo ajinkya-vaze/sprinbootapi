@@ -24,11 +24,16 @@ public class ServerImpl implements Server {
      */
     @Override
     public boolean saveDataEnvelope(DataEnvelope envelope) {
+        if(validateChecksum(envelope)) {
+            // Save to persistence.
+            persist(envelope);
+            log.info("Data persisted successfully, data name: {}", envelope.getDataHeader().getName());
+            return true;
+        }
+        return false;
+    }
 
-        // Save to persistence.
-        persist(envelope);
-
-        log.info("Data persisted successfully, data name: {}", envelope.getDataHeader().getName());
+    private boolean validateChecksum(DataEnvelope envelope) {
         return true;
     }
 

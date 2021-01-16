@@ -14,6 +14,7 @@ public class TestDataHelper {
     public static final String TEST_NAME = "Test";
     public static final String TEST_NAME_EMPTY = "";
     public static final String DUMMY_DATA = "AKCp5fU4WNWKBVvhXsbNhqk33tawri9iJUkA5o4A6YqpwvAoYjajVw8xdEw6r9796h1wEp29D";
+    public static final String DUMMY_DATA_MD5_CHECKSUM = "CECFD3953783DF706878AAEC2C22AA70";
 
     public static DataHeaderEntity createTestDataHeaderEntity(Instant expectedTimestamp) {
         DataHeaderEntity dataHeaderEntity = new DataHeaderEntity();
@@ -31,16 +32,32 @@ public class TestDataHelper {
     }
 
     public static DataEnvelope createTestDataEnvelopeApiObject() {
-        DataBody dataBody = new DataBody(DUMMY_DATA);
-        DataHeader dataHeader = new DataHeader(TEST_NAME, BlockTypeEnum.BLOCKTYPEA);
+        DataBody dataBody = createDataBody();
+        DataHeader dataHeader = createDataHeader(TEST_NAME, DUMMY_DATA_MD5_CHECKSUM);
+
+        DataEnvelope dataEnvelope = new DataEnvelope(dataHeader, dataBody);
+        return dataEnvelope;
+    }
+
+    private static DataHeader createDataHeader(String testName, String checksum) {
+        return new DataHeader(testName, BlockTypeEnum.BLOCKTYPEA, checksum);
+    }
+
+    private static DataBody createDataBody() {
+        return new DataBody(DUMMY_DATA);
+    }
+
+    public static DataEnvelope createTestDataEnvelopeApiObjectWithWrongChecksum() {
+        DataBody dataBody = createDataBody();
+        DataHeader dataHeader = createDataHeader(TEST_NAME, "testChecksum");
 
         DataEnvelope dataEnvelope = new DataEnvelope(dataHeader, dataBody);
         return dataEnvelope;
     }
 
     public static DataEnvelope createTestDataEnvelopeApiObjectWithEmptyName() {
-        DataBody dataBody = new DataBody(DUMMY_DATA);
-        DataHeader dataHeader = new DataHeader(TEST_NAME_EMPTY, BlockTypeEnum.BLOCKTYPEA);
+        DataBody dataBody = createDataBody();
+        DataHeader dataHeader = createDataHeader(TEST_NAME_EMPTY, DUMMY_DATA_MD5_CHECKSUM);
 
         DataEnvelope dataEnvelope = new DataEnvelope(dataHeader, dataBody);
         return dataEnvelope;
