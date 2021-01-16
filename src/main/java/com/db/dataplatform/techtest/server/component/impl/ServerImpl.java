@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ public class ServerImpl implements Server {
 
     /**
      * Saves envelop in the database if checksum matches.
+     *
      * @param envelope Data to be saved in the database
      * @return true if there is a match with the client provided checksum.
      */
@@ -52,6 +54,7 @@ public class ServerImpl implements Server {
 
     /**
      * Finds data by block type
+     *
      * @param blockType Block type to be search in the database
      * @return List of DataEnvelop models containing data
      */
@@ -63,12 +66,14 @@ public class ServerImpl implements Server {
 
     /**
      * Updates block type by for given block name
+     *
      * @param blockName Name of the block to be updated
      * @param blockType Block type to be updated
      * @return true if data is successfully updated in the database
      * @throws RecordNotFoundException if there is no record in the database with given blockName
      */
     @Override
+    @Transactional
     public boolean updateBlockTypeByName(String blockName, BlockTypeEnum blockType) throws RecordNotFoundException {
         Optional<DataBodyEntity> dataBodyEntityOptional = dataBodyServiceImpl.getDataByBlockName(blockName);
         if (!dataBodyEntityOptional.isPresent()) {
