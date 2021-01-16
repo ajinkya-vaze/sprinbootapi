@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import static com.db.dataplatform.techtest.Constant.DUMMY_DATA;
+import static com.db.dataplatform.techtest.Constant.DUMMY_DATA_MD5_CHECKSUM;
 
 @SpringBootApplication
 @EnableRetry
@@ -55,7 +56,7 @@ public class TechTestApplication {
 
 		DataBody dataBody = new DataBody(DUMMY_DATA);
 
-		DataHeader dataHeader = new DataHeader(HEADER_NAME, BlockTypeEnum.BLOCKTYPEA);
+		DataHeader dataHeader = new DataHeader(HEADER_NAME, BlockTypeEnum.BLOCKTYPEA, DUMMY_DATA_MD5_CHECKSUM);
 
 		DataEnvelope dataEnvelope = new DataEnvelope(dataHeader, dataBody);
 
