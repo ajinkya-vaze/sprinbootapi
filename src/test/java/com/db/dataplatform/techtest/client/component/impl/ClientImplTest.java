@@ -1,6 +1,7 @@
 package com.db.dataplatform.techtest.client.component.impl;
 
 import com.db.dataplatform.techtest.client.api.model.DataEnvelope;
+import com.db.dataplatform.techtest.server.persistence.BlockTypeEnum;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,8 +15,10 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -61,5 +64,40 @@ public class ClientImplTest {
         when(restTemplate.postForObject(any(String.class), any(HttpEntity.class), ArgumentMatchers.<Class<Boolean>>any())).thenThrow(new RestClientException("Exception while creating the request"));
         boolean response = client.pushData(testDataEnvelope);
         assertFalse(response);
+    }
+
+    @Test
+    public void getDataShouldWorkWhenApiCallIsSuccessful() {
+        List<DataEnvelope> expectedData = Arrays.asList(testDataEnvelope);
+        when(restTemplate.getForObject(any(String.class), ArgumentMatchers.<Class<List>>any(), any(Object.class))).thenReturn(expectedData);
+        List<DataEnvelope> actualData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
+        assertEquals(expectedData, actualData);
+    }
+
+    @Test
+    public void getDataReturnEmptyListWhenApiCallFailsWithInvalidInput() {
+        when(restTemplate
+                .getForObject(any(String.class), ArgumentMatchers.<Class<List>>any(), any(Object.class))
+        ).thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST));
+        List<DataEnvelope> responseData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
+        assertEquals(0, responseData.size());
+    }
+
+    @Test
+    public void getDataReturnEmptyListWhenApiCallFailsWithInvalidResponseFromServer() {
+        when(restTemplate
+                .getForObject(any(String.class), ArgumentMatchers.<Class<List>>any(), any(Object.class))
+        ).thenThrow(new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR));
+        List<DataEnvelope> responseData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
+        assertEquals(0, responseData.size());
+    }
+
+    @Test
+    public void getDataReturnEmptyListWhenApiCallFails() {
+        when(restTemplate
+                .getForObject(any(String.class), ArgumentMatchers.<Class<List>>any(), any(Object.class))
+        ).thenThrow(new RestClientException("Exception while creating the request"));
+        List<DataEnvelope> responseData = client.getData(BlockTypeEnum.BLOCKTYPEA.name());
+        assertEquals(0, responseData.size());
     }
 }

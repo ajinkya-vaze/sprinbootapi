@@ -1,7 +1,10 @@
 package com.db.dataplatform.techtest.server.component.impl;
 
+import com.db.dataplatform.techtest.server.api.model.DataBody;
 import com.db.dataplatform.techtest.server.api.model.DataEnvelope;
+import com.db.dataplatform.techtest.server.api.model.DataHeader;
 import com.db.dataplatform.techtest.server.component.Server;
+import com.db.dataplatform.techtest.server.persistence.BlockTypeEnum;
 import com.db.dataplatform.techtest.server.persistence.model.DataBodyEntity;
 import com.db.dataplatform.techtest.server.persistence.model.DataHeaderEntity;
 import com.db.dataplatform.techtest.server.service.DataBodyService;
@@ -10,6 +13,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,6 +38,22 @@ public class ServerImpl implements Server {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<DataEnvelope> getDataByBlockType(BlockTypeEnum blockType) {
+        List<DataBodyEntity> dataBodyEntities = dataBodyServiceImpl.getDataByBlockType(blockType);
+        return mapToDataEnvelop(dataBodyEntities);
+    }
+
+    private List<DataEnvelope> mapToDataEnvelop(List<DataBodyEntity> dataBodyEntities) {
+        List<DataEnvelope> dataEnvelopes = dataBodyEntities.stream()
+                .map(dataBodyEntity -> {
+                    DataBody dataBody = modelMapper.map(dataBodyEntity, DataBody.class);
+                    DataHeader dataHeader = modelMapper.map(dataBodyEntity.getDataHeaderEntity(), DataHeader.class);
+                    return new DataEnvelope(dataHeader, dataBody);
+                }).collect(Collectors.toList());
+        return dataEnvelopes;
     }
 
     private boolean validateChecksum(DataEnvelope envelope) {

@@ -10,6 +10,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriTemplate;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,7 +49,14 @@ public class ClientImpl implements Client {
     @Override
     public List<DataEnvelope> getData(String blockType) {
         log.info("Query for data with header block type {}", blockType);
-        return null;
+        try {
+            List<DataEnvelope> responseData = restTemplate.getForObject(URI_GETDATA.toString(), List.class, blockType);
+            log.info("Successfully received response from server for block type {}", blockType);
+            return responseData;
+        } catch (RestClientException rce) {
+            log.error("Exception while querying for data with header block type {}", blockType, rce);
+            return Collections.emptyList();
+        }
     }
 
     @Override
